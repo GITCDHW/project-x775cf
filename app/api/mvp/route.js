@@ -16,7 +16,7 @@ export async function POST(req) {
       json: { hooks: ["string", "string", "string"] },
       budget: budget,
     });
-
+console.log(aiResponse)
     if (!aiResponse || !Array.isArray(aiResponse.hooks) || aiResponse.hooks.length !== 3) {
       throw new Error("AI response did not return the expected three hooks.");
     }
