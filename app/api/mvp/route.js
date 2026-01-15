@@ -1,0 +1,43 @@
+import { getAiResponse, createBudget, assertSafe } from "https://go-starter-ai.vercel.app/libs/giga.js";
+
+export async function POST(req) {
+  let budget;
+  try {
+    budget = createBudget({ maxCalls: 1, maxChars: 5000 });
+
+    const body = await req.json();
+
+    // Input validation
+    assertSafe(body.text, "Input 'text' is required.");
+    assertSafe(typeof body.text === 'string', "Input 'text' must be a string.");
+    assertSafe(body.text.trim().length > 0, "Input 'text' cannot be empty.");
+
+    const rawText = body.text;
+
+    const aiPrompt = `Generate exactly three distinct, high-impact social media hooks from the following text. Each hook should be concise, engaging, and suitable for platforms like Twitter, LinkedIn, or Instagram. Do not include any introductory or concluding remarks, just the hooks themselves.\n\nProvided text:\n"""\n${rawText}\n"""`;
+
+    const aiResponse = await getAiResponse({
+      prompt: aiPrompt,
+      json: { hooks: ["string", "string", "string"] },
+      budget: budget,
+    });
+
+    if (!aiResponse || !Array.isArray(aiResponse.hooks) || aiResponse.hooks.length !== 3) {
+      throw new Error("AI response did not return the expected three hooks.");
+    }
+
+    return Response.json({ hooks: aiResponse.hooks }, { status: 200 });
+
+  } catch (error) {
+    const errorMessage = error.message || "An unexpected error occurred.";
+    const statusCode = error.message && (errorMessage.includes("required") || errorMessage.includes("must be a string") || errorMessage.includes("cannot be empty")) ? 400 : 500;
+    
+    return Response.json({ error: errorMessage }, { status: statusCode });
+
+  } finally {
+    if (budget) {
+      // The budget automatically tracks usage. No explicit store() call needed for basic tracking.
+      // If there were a persistent budget or user-specific tracking, 'store' would be used here.
+    }
+  }
+}
