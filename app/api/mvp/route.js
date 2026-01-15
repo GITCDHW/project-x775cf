@@ -1,4 +1,4 @@
-import { getAiResponse, createBudget, assertSafe } from "../libs/giga.js";
+import { getAiResponse, createBudget, assertSafe } from "@/libs/giga.js";
 
 export async function POST(req) {
   let budget;
