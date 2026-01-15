@@ -7,11 +7,6 @@ export async function POST(req) {
 
     const body = await req.json();
 
-    // Input validation
-    assertSafe(body.text, "Input 'text' is required.");
-    assertSafe(typeof body.text === 'string', "Input 'text' must be a string.");
-    assertSafe(body.text.trim().length > 0, "Input 'text' cannot be empty.");
-
     const rawText = body.text;
 
     const aiPrompt = `Generate exactly three distinct, high-impact social media hooks from the following text. Each hook should be concise, engaging, and suitable for platforms like Twitter, LinkedIn, or Instagram. Do not include any introductory or concluding remarks, just the hooks themselves.\n\nProvided text:\n"""\n${rawText}\n"""`;
